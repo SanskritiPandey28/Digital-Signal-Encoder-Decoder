@@ -5,10 +5,15 @@ from data_generator import (
     find_longest_palindrome
 )
 
+from plotting import plot_digital_data
+
 bits = generate_random_bits(20)
 
 print("Random digital data:")
 print(bits)
+
+
+plot_digital_data(bits)
 
 print("\nLongest palindromic substring:")
 print(find_longest_palindrome(bits))
