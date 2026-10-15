@@ -31,11 +31,20 @@ def plot_digital_data(bits):
 
 
 # 2. Plot the encoded line signal
-def plot_line_signal(signal, title="Line-Coded Signal"):
+
+def plot_line_signal(
+    signal,
+    title="Line-Coded Signal",
+    samples_per_bit=1
+):
     if not signal:
         raise ValueError("Signal cannot be empty.")
 
-    time = list(range(len(signal) + 1))
+    time = [
+        i / samples_per_bit
+        for i in range(len(signal) + 1)
+    ]
+
     levels = signal + [signal[-1]]
 
     plt.figure(figsize=(10, 4))
@@ -45,7 +54,6 @@ def plot_line_signal(signal, title="Line-Coded Signal"):
     plt.xlabel("Time (bit intervals)")
     plt.ylabel("Signal level")
 
-    plt.xticks(time)
     plt.yticks([-1, 0, 1])
     plt.ylim(-1.5, 1.5)
     plt.grid(True)
