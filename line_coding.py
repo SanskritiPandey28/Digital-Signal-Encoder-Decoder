@@ -77,3 +77,10 @@ def apply_pulses(symbols, initial_level=-1):
 # 5. AMI (Alternate Mark Inversion) Encoding
 def encode_ami(bits):
     return apply_pulses(bits)
+
+
+# 6. B8ZS Scrambling (Bipolar with 8-Zero Substitution)
+# Every run of 8 zeros is replaced by 000VB0VB, then the
+# pulse table turns V and B into the right voltages
+def scramble_b8zs(bits):
+    return apply_pulses(bits.replace('00000000', '000VB0VB'))
