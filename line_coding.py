@@ -46,3 +46,34 @@ def encode_differential_manchester(bits, initial_level=-1):
         current_level = -current_level
 
     return signal
+
+
+# Pulse table used by AMI (and later by the scrambling schemes)
+# symbol : (has_pulse, flips_polarity)
+#   '0' -> no pulse, polarity unchanged
+#   '1' -> pulse, polarity flips (normal AMI mark)
+#   'B' -> pulse, polarity flips (bipolar pulse, follows the AMI rule)
+#   'V' -> pulse, polarity NOT flipped (violation, same sign as last pulse)
+PULSE_TABLE = {
+    '0': (0, 0),
+    '1': (1, 1),
+    'B': (1, 1),
+    'V': (1, 0)
+}
+
+
+def apply_pulses(symbols, initial_level=-1):
+    signal = []
+    current_level = initial_level
+
+    for symbol in symbols:
+        has_pulse, flips = PULSE_TABLE[symbol]
+        current_level *= (-1) ** flips
+        signal.append(has_pulse * current_level)
+
+    return signal
+
+
+# 5. AMI (Alternate Mark Inversion) Encoding
+def encode_ami(bits):
+    return apply_pulses(bits)
