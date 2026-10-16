@@ -1,4 +1,6 @@
 
+import re
+
 # 1. NRZ-L Encoding
 def encode_nrz_l(bits):
     mapping = {
@@ -84,3 +86,29 @@ def encode_ami(bits):
 # pulse table turns V and B into the right voltages
 def scramble_b8zs(bits):
     return apply_pulses(bits.replace('00000000', '000VB0VB'))
+
+
+# 7. HDB3 Scrambling (High-Density Bipolar 3-Zero)
+# Every run of 4 zeros is replaced depending on how many pulses
+# came since the last substitution:
+#   odd  number of pulses -> 000V
+#   even number of pulses -> B00V
+HDB3_PATTERN = {
+    1: '000V',
+    0: 'B00V'
+}
+
+
+def scramble_hdb3(bits):
+    symbols = []
+    previous_end = 0
+
+    for match in re.finditer('0000', bits):
+        segment = bits[previous_end:match.start()]
+        symbols.append(segment)
+        symbols.append(HDB3_PATTERN[segment.count('1') % 2])
+        previous_end = match.end()
+
+    symbols.append(bits[previous_end:])
+
+    return apply_pulses(''.join(symbols))
