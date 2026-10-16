@@ -46,3 +46,19 @@ def encode_differential_manchester(bits, initial_level=-1):
         current_level = -current_level
 
     return signal
+
+
+# 5. AMI (Alternate Mark Inversion) Encoding
+# 0 -> zero voltage, 1 -> a pulse that alternates between +1 and -1
+def encode_ami(bits):
+    signal = []
+    last_pulse = -1   # so that the first '1' becomes +1
+
+    for bit in bits:
+        if bit == '1':
+            last_pulse = -last_pulse
+            signal.append(last_pulse)
+        else:
+            signal.append(0)
+
+    return signal
