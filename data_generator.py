@@ -22,43 +22,33 @@ def generate_bits_with_zeros(length, zero_count):
     return ''.join(map(str, bits))
 
 
+# Longest palindrome using Manacher's algorithm - O(n)
 def find_longest_palindrome(bits):
-    n = len(bits)
+    # Put '#' between characters so odd and even palindromes
+    # are handled the same way. '^' and '$' stop the expansion
+    # at both ends without needing bounds checks.
+    t = '^#' + '#'.join(bits) + '#$'
+    n = len(t)
 
-    if n == 0:
-        return ""
+    p = [0] * n        # p[i] = palindrome radius around position i
+    center = 0
+    right = 0          # rightmost edge reached by any palindrome so far
 
-    longest = ""
+    for i in range(1, n - 1):
+        mirror = 2 * center - i
 
-    for center in range(n):
-        # Odd-length palindrome
-        left = center
-        right = center
+        # Reuse the mirror's answer (only inside the known palindrome)
+        p[i] = max(0, min(right - i, p[mirror]))
 
-        while (
-            left >= 0
-            and right < n
-            and bits[left] == bits[right]
-        ):
-            if right - left + 1 > len(longest):
-                longest = bits[left:right + 1]
+        # Try to expand further
+        while t[i + p[i] + 1] == t[i - p[i] - 1]:
+            p[i] += 1
 
-            left -= 1
-            right += 1
+        # Move the window if this palindrome reaches further right
+        right, center = max((right, center), (i + p[i], i))
 
-        # Even-length palindrome
-        left = center
-        right = center + 1
+    best_length = max(p)
+    best_center = p.index(best_length)
+    start = (best_center - 1 - best_length) // 2
 
-        while (
-            left >= 0
-            and right < n
-            and bits[left] == bits[right]
-        ):
-            if right - left + 1 > len(longest):
-                longest = bits[left:right + 1]
-
-            left -= 1
-            right += 1
-
-    return longest
+    return bits[start:start + best_length]
