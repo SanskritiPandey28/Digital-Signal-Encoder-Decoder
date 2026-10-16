@@ -59,3 +59,78 @@ def plot_line_signal(
     plt.grid(True)
 
     plt.show()
+
+
+# 3. Plot the analog signal, its samples and the PCM reconstruction
+def plot_pcm(
+    analog_time,
+    analog_signal,
+    sample_time,
+    samples,
+    decoded_samples
+):
+    plt.figure(figsize=(10, 4))
+
+    plt.plot(analog_time, analog_signal, label="Analog signal")
+    plt.stem(sample_time, samples, linefmt="C1-", markerfmt="C1o",
+             basefmt=" ", label="Samples")
+    plt.step(sample_time, decoded_samples, where="post",
+             color="C2", label="PCM decoded (quantized)")
+
+    plt.title("Pulse Code Modulation")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.show()
+
+
+# 4. Plot the analog signal with the Delta Modulation staircase
+def plot_dm(
+    analog_time,
+    analog_signal,
+    sample_time,
+    staircase
+):
+    plt.figure(figsize=(10, 4))
+
+    plt.plot(analog_time, analog_signal, label="Analog signal")
+    plt.step(sample_time, staircase, where="post",
+             color="C3", label="DM staircase (decoder output)")
+
+    plt.title("Delta Modulation")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.show()
+
+
+# 5. Plot AMI before scrambling and after scrambling, one above the other
+def plot_scrambling(ami_signal, scrambled_signal, scheme_name):
+    time = list(range(len(ami_signal) + 1))
+
+    figure, (top, bottom) = plt.subplots(
+        2, 1, figsize=(10, 6), sharex=True
+    )
+
+    top.step(time, ami_signal + [ami_signal[-1]], where="post")
+    top.set_title("AMI (before scrambling)")
+
+    bottom.step(time, scrambled_signal + [scrambled_signal[-1]],
+                where="post", color="C3")
+    bottom.set_title(f"{scheme_name} (after scrambling)")
+    bottom.set_xlabel("Time (bit intervals)")
+
+    for axis in (top, bottom):
+        axis.set_ylabel("Signal level")
+        axis.set_yticks([-1, 0, 1])
+        axis.set_ylim(-1.5, 1.5)
+        axis.grid(True)
+
+    figure.tight_layout()
+    plt.show()
