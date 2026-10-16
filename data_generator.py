@@ -1,5 +1,4 @@
 
-import re
 import numpy as np
 
 
@@ -56,11 +55,8 @@ def find_longest_palindrome(bits):
 
 
 # Longest run of consecutive zeros - O(n)
-# Returns (length, start_index); (0, -1) if there are no zeros
+# Splitting at every '1' leaves only the blocks of zeros,
+# e.g. '1001000' -> ['', '00', '000'], so the longest block wins
 def find_longest_zero_run(bits):
-    runs = [
-        (len(match.group()), match.start())
-        for match in re.finditer('0+', bits)
-    ] + [(0, -1)]
-
-    return max(runs, key=lambda run: run[0])
+    zero_blocks = bits.split('1')
+    return max(len(block) for block in zero_blocks)
