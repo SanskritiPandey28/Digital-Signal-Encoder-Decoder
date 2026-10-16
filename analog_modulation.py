@@ -52,3 +52,31 @@ def pcm_decode(bits, n_bits, v_min, v_max):
     ])
 
     return v_min + (level_index + 0.5) * step
+
+
+# ==========================================
+# DM (Delta Modulation)
+# ==========================================
+
+# Send 1 bit per sample:
+#   1 -> the signal is above our staircase, so step UP by delta
+#   0 -> the signal is below our staircase, so step DOWN by delta
+def dm_encode(samples, delta, initial_level=0.0):
+    bits = []
+    staircase = []
+    current_level = initial_level
+
+    for sample in samples:
+        bit = int(sample > current_level)
+        current_level += delta * (2 * bit - 1)    # 1 -> +delta, 0 -> -delta
+        bits.append(str(bit))
+        staircase.append(current_level)
+
+    return ''.join(bits), np.array(staircase)
+
+
+# Rebuild the staircase from the bits alone:
+# every 1 adds +delta and every 0 adds -delta
+def dm_decode(bits, delta, initial_level=0.0):
+    steps = np.array([2 * int(bit) - 1 for bit in bits])
+    return initial_level + delta * np.cumsum(steps)
